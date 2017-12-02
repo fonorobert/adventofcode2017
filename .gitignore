@@ -1,0 +1,11 @@
+# build directory contents
+build/*
+
+# temp directory for local scrap files
+temp/*
+
+# valgrind outputs
+vgcore.*
+
+# swp files
+*.swp
