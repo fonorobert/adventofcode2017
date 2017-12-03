@@ -1,5 +1,6 @@
 builddir = build
 srcdir = src
+libdir = src/lib
 CC = gcc
 CFLAGS = -lm
 
@@ -8,8 +9,8 @@ outputs = $(basename $(srcfiles))
 
 all: $(outputs)
 
-$(outputs): %: $(srcdir)/%.c
-	$(CC) $(CFLAGS) -o $(builddir)/$@ $<
+$(outputs): %: $(srcdir)/%.c $(libdir)/*.c
+	$(CC) $(CFLAGS) -o $(builddir)/$@ $^
 
 clean:
 	rm build/*

@@ -7,9 +7,9 @@
 #include <math.h>
 #include <stdbool.h>
 #include <string.h>
+#include "lib/utils.h"
 
 int sumpairs(char *digits, int step);
-int chartoi(char c);
 int getnextpos(int pos, int len, int step);
 
 int main(int argc, char *argv[]) {
@@ -50,9 +50,4 @@ int getnextpos(int pos, int len, int step) {
 		nextpos = nextpos - len;
 	}
 	return nextpos;
-}
-
-int chartoi(char c) {
-	int i = c - '0';
-	return i;
 }
