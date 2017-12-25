@@ -1,66 +1,72 @@
 // checksum: sum of differences between largest and smallest value on each line
 // spreadsheet: entered as command line argument, delimiter is LF (coded 10 in ascii)
+// use strtok() to tokenize string input
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
 #include "lib/utils.h"
 
-int checksum(char *input);
+char *ptr;
+long inlen;
+long linediff();
 
 int main(int argc, char *argv[]) {
-	int result = checksum(argv[1]);
-	printf("checksum: %d\n", result);
+	
+	int checksum = 0;
+
+	char *input = argv[1];
+	inlen = strlen(input);
+	ptr = input;
+	
+	long curdiff = 0;
+	printf("&ptr: %ld, *ptr: %c\n", ptr, *ptr);
+	do {
+		curdiff = linediff();
+		//TODO: stop ptr from moving past EOI
+		//need to detect EOI somehow
+		if(&ptr<&input+inlen-1){
+			ptr++;
+		}
+		printf("%d\n", curdiff);
+		checksum += curdiff;
+		printf("&ptr: %ld, *ptr: %c\n", ptr, *ptr);
+	} while(curdiff != -1);
+	printf("EOI, diff: %ld\n", curdiff);
 	return 0;
 }
 
-int checksum(char *input) {
-	int large = 0;
-	int small = 0;
-	int current = 0;
-	int checksum = 0;
-	int len = strlen(input);
-
-	// set first digit as both small and large
-	small = chartoi(input[0]);
-	large = chartoi(input[0]);
-
-//	printf("len %d small %d large %d\n\n", len, small, large);
-
-	for (int i = 0; i<=len; i++) {
-	//	printf("i %d\n", i);
-		// calculate difference, then reset if end of line
-		if (input[i] == 10 || i == len) {
-	//		printf("small %d large %d diff %d\n", small, large, large-small);
-			if (large > small) {
-				checksum += large - small;
-			//	printf("cur sum %d\n", checksum);
-			}
-			if(i == len) {
-			//	printf("end of input");
-				return checksum;
-			}
-			if (i<len) {
-				large = chartoi(input[i+1]);
-				small = chartoi(input[i+1]);
-			} else {
-				break;
-			}
-			continue;
-		}
-		if (!isdigit(input[i])) {
-			continue;
-		}
-
-		current = chartoi(input[i]);
-		
-		if (current > large) { 
-			large = current;
-		}
-
-		if (current < small) {
-			small = current;
-		}
+long linediff() {
+	if(!isdigit(*ptr)) {
+		return -1;
 	}
 
+	long large = 0;
+	long small = 999999999999999999;
+	long diff = 0;
+	
+	do {
+		int i = 0;
+		char buffer[40] = {'\0'};
+
+		do {
+			buffer[i] = *ptr;
+			i++;
+			ptr++;
+			buffer[i] = '\0';
+		} while (isdigit(*ptr));
+		
+		long num = atol(buffer);
+
+		if(num > large) {
+			large = num;
+		} else if (num < small) {
+			small = num;
+		}
+	} while (*ptr != 10);
+
+	
+	diff = large - small;	
+	return diff;
 }
