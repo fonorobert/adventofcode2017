@@ -8,65 +8,102 @@
 #include <string.h>
 #include "lib/utils.h"
 
-char *ptr;
-long inlen;
-long linediff();
+#define false 0
+#define true 1
+
+//long linediff(char **lptr, char *last);
 
 int main(int argc, char *argv[]) {
+
+	// get argument
+	char *input = argv[1];
 	
 	int checksum = 0;
-
-	char *input = argv[1];
-	inlen = strlen(input);
-	ptr = input;
 	
-	long curdiff = 0;
-	printf("&ptr: %ld, *ptr: %c\n", ptr, *ptr);
-	do {
-		curdiff = linediff();
-		//TODO: stop ptr from moving past EOI
-		//need to detect EOI somehow
-		if(&ptr<&input+inlen-1){
-			ptr++;
-		}
-		printf("%d\n", curdiff);
-		checksum += curdiff;
-		printf("&ptr: %ld, *ptr: %c\n", ptr, *ptr);
-	} while(curdiff != -1);
-	printf("EOI, diff: %ld\n", curdiff);
-	return 0;
-}
+	// flag to mark end of input
+	int eoi = false;
 
-long linediff() {
-	if(!isdigit(*ptr)) {
-		return -1;
-	}
-
-	long large = 0;
-	long small = 999999999999999999;
-	long diff = 0;
-	
 	do {
-		int i = 0;
-		char buffer[40] = {'\0'};
+		// array of numbers in current line
+		int line[50];
+
+		// array of characters in current number
+		char current[10];
+
+		// counter for length of current number
+		int curlen = 0;
+
+		// counter for length of current line
+		int linelen = 0;
+
+		// flag to mark if end of line is reached
+		int eol = false;
 
 		do {
-			buffer[i] = *ptr;
-			i++;
-			ptr++;
-			buffer[i] = '\0';
-		} while (isdigit(*ptr));
+			// check if pointing to a digit
+			if (isdigit(*input)) {
+				// add character to current number
+				current[curlen] = *input;
+				// increment length
+				curlen++;
+			} 
+
+			// increment pointer
+			input++;
 		
-		long num = atol(buffer);
+			if (!isdigit(*input)) {
+				// mark end of line reached
+				if (*input == 10 || *input == '\0') {
+					eol = true;
+				}
+			
+				// null-terminate current character
+				current[curlen] = '\0';
+				// convert current num to int, append to line array
+				line[linelen] = atoi(current);
+				// increment line length
+				linelen++;
 
-		if(num > large) {
-			large = num;
-		} else if (num < small) {
-			small = num;
+				// reset current char
+				curlen = 0;
+				current[0] = '\0';
+			}	
+
 		}
-	} while (*ptr != 10);
+		while(!eol);
 
+
+		// initialize small and large
+		int small;
+		int large;
+
+		small = line[0];
+		large = line[0];
+
+		// iterate through line
 	
-	diff = large - small;	
-	return diff;
+		for (int i = 0; i < linelen; i++) {
+			if (line[i] > large) {
+				large = line[i];
+			}
+			if (line[i] < small) {
+				small = line[i];
+			}
+		}
+
+		int diff = large - small;
+
+		// add difference to checksum
+		checksum += diff;
+
+		printf("largest: %d; smallest: %d; difference: %d\n", large, small, diff);
+
+		if (*input == '\0') {
+			eoi = true;
+		}
+
+	} while (!eoi);
+
+	printf("checksum: %d\n", checksum);
+	return 0;
 }
