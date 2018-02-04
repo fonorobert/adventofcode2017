@@ -11,7 +11,6 @@
 #define false 0
 #define true 1
 
-//long linediff(char **lptr, char *last);
 
 int main(int argc, char *argv[]) {
 
